@@ -3,8 +3,9 @@
 import { useState, useCallback, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
-import { UploadCloud, FileType, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, CheckCircle, FileType, RefreshCw, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormatPicker } from "./format-picker";
 
 type UploadState = "idle" | "hover" | "dragging" | "uploading" | "success" | "error";
 
@@ -89,6 +90,7 @@ export function Dropzone() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: false,
+    disabled: state !== "idle" && state !== "dragging",
     onDragEnter: () => setState("dragging"),
     onDragLeave: () => setState("idle"),
   });
@@ -109,7 +111,7 @@ export function Dropzone() {
         {...getRootProps()}
         className={`relative flex flex-col items-center justify-center p-12 overflow-hidden border-2 border-dashed rounded-2xl transition-colors cursor-pointer bg-card
           ${state === "dragging" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
-          ${(state === "uploading" || state === "success" || state === "error") ? "pointer-events-none" : ""}
+          ${(state === "uploading" || state === "error") ? "pointer-events-none" : ""}
         `}
       >
         <input {...getInputProps()} />
@@ -176,7 +178,7 @@ export function Dropzone() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="flex flex-col items-center text-center space-y-4"
+              className="flex flex-col items-center text-center space-y-4 w-full"
             >
               <div className="p-4 rounded-full bg-green-500/10 text-green-500">
                 <CheckCircle className="w-8 h-8" />
@@ -185,9 +187,19 @@ export function Dropzone() {
                 <p className="text-lg font-medium text-foreground">Upload Complete</p>
                 <p className="text-sm text-muted-foreground mt-1 truncate max-w-xs">{fileName}</p>
               </div>
-              {/* In the future, this is where we'd show the format picker or redirect */}
-              <Button variant="outline" onClick={(e) => { e.stopPropagation(); setState("idle"); }}>
-                Upload another
+              
+              <div className="w-full mt-4" onClick={(e) => e.stopPropagation()}>
+                <FormatPicker 
+                  sourceExtension={fileName.split(".").pop() || ""}
+                  onSelect={(targetFormat) => {
+                    console.log("Selected target:", targetFormat);
+                    alert(`Conversion to ${targetFormat.toUpperCase()} will trigger in Prompt 8!`);
+                  }}
+                />
+              </div>
+
+              <Button variant="outline" onClick={(e) => { e.stopPropagation(); setState("idle"); }} className="mt-4">
+                Upload another file
               </Button>
             </motion.div>
           )}
