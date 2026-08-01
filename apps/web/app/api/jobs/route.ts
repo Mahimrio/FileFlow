@@ -4,6 +4,7 @@ import { ratelimit } from "@/lib/rate-limit";
 import { FORMATS } from "@repo/shared";
 import { fileTypeFromBuffer } from "file-type";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { conversionQueue } from "@/lib/queue-producer";
 
 const endpoint = process.env.S3_ENDPOINT;
 const accessKeyId = process.env.S3_ACCESS_KEY_ID;
@@ -98,6 +99,15 @@ export async function POST(request: Request) {
         expiresAt,
       },
     });
+
+    // 6. Trigger Queue
+    const payload = {
+      jobId: job.id,
+      storageKeySource,
+      sourceFormat: sourceFormat.toLowerCase(),
+      targetFormat: targetFormat.toLowerCase(),
+    };
+    await conversionQueue.add("convert", payload);
 
     return NextResponse.json({ jobId: job.id }, { status: 201 });
 

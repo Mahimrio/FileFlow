@@ -6,8 +6,14 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
     "tsx": "^4.0.0",
-    "@types/node": "^20.0.0"
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@repo/shared": "*",
+    "bullmq": "^6.0.5",
+    "dotenv": "^17.4.2",
+    "ioredis": "^6.0.0"
   }
 }
