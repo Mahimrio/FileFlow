@@ -1,3 +1,5 @@
+import { Dropzone } from "@/components/upload/dropzone";
+
 export function Hero() {
   return (
     <section className="py-20 md:py-28 text-center px-4 md:px-6">
@@ -9,11 +11,7 @@ export function Hero() {
           Instantly transform documents, images, spreadsheets, and more between over 180 formats with unparalleled precision.
         </p>
         <div className="mx-auto mt-10 max-w-2xl">
-          <div className="flex h-64 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/25 bg-muted/20 transition-colors hover:border-primary/50 hover:bg-muted/40">
-            <p className="text-sm font-medium text-muted-foreground">
-              Drag & drop a file, or click to browse
-            </p>
-          </div>
+          <Dropzone />
         </div>
       </div>
     </section>
