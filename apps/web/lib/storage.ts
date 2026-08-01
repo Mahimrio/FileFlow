@@ -15,6 +15,7 @@ const getS3Client = () => {
   return new S3Client({
     region: process.env.S3_REGION || "auto",
     endpoint: endpoint,
+    forcePathStyle: true,
     credentials: {
       accessKeyId,
       secretAccessKey,
