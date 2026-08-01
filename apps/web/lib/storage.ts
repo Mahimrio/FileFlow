@@ -1,20 +1,20 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const accountId = process.env.R2_ACCOUNT_ID;
-const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-const bucketName = process.env.R2_BUCKET_NAME;
+const endpoint = process.env.S3_ENDPOINT;
+const accessKeyId = process.env.S3_ACCESS_KEY_ID;
+const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+const bucketName = process.env.S3_BUCKET_NAME;
 
 // We do not throw an error at the top level to allow the build to succeed without env variables,
 // but we will throw it when functions are called if they are missing.
 const getS3Client = () => {
-  if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
-    throw new Error("Missing R2 storage credentials in environment variables.");
+  if (!endpoint || !accessKeyId || !secretAccessKey || !bucketName) {
+    throw new Error("Missing S3 storage credentials in environment variables.");
   }
   return new S3Client({
-    region: "auto",
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    region: process.env.S3_REGION || "auto",
+    endpoint: endpoint,
     credentials: {
       accessKeyId,
       secretAccessKey,
