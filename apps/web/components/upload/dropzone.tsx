@@ -14,6 +14,7 @@ export function Dropzone() {
   const [progress, setProgress] = useState(0);
   const [fileName, setFileName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [uploadedStorageKey, setUploadedStorageKey] = useState("");
   const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   const uploadFile = async (file: File) => {
@@ -67,11 +68,9 @@ export function Dropzone() {
         xhr.send(file);
       });
 
-      // 3. Stub: Create Job
-      // TODO: /api/jobs not built until Prompt 8
+      // 3. Save key for Format Picker
       console.log("File uploaded successfully. Storage key:", storageKey);
-      // await fetch("/api/jobs", { method: "POST", body: JSON.stringify({ ... }) });
-      
+      setUploadedStorageKey(storageKey);
       setState("success");
     } catch (err: any) {
       console.error(err);
@@ -191,9 +190,26 @@ export function Dropzone() {
               <div className="w-full mt-4" onClick={(e) => e.stopPropagation()}>
                 <FormatPicker 
                   sourceExtension={fileName.split(".").pop() || ""}
-                  onSelect={(targetFormat) => {
-                    console.log("Selected target:", targetFormat);
-                    alert(`Conversion to ${targetFormat.toUpperCase()} will trigger in Prompt 8!`);
+                  onSelect={async (targetFormat) => {
+                    try {
+                      const sourceFormat = fileName.split(".").pop() || "";
+                      const res = await fetch("/api/jobs", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          sourceFileName: fileName,
+                          sourceFormat,
+                          targetFormat,
+                          storageKeySource: uploadedStorageKey,
+                        }),
+                      });
+                      const data = await res.json();
+                      if (!res.ok) throw new Error(data.error || "Failed to create job");
+                      
+                      alert(`Job created successfully! ID: ${data.jobId}\n(The background worker will be added in Prompt 9 to process this!)`);
+                    } catch (err: any) {
+                      alert(`Error: ${err.message}`);
+                    }
                   }}
                 />
               </div>
